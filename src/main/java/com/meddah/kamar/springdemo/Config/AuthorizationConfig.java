@@ -1,6 +1,7 @@
 package com.meddah.kamar.springdemo.Config;
 
 import com.meddah.kamar.springdemo.Config.Filters.JwtAuthFilter;
+import com.meddah.kamar.springdemo.Service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,18 +22,19 @@ public class AuthorizationConfig extends WebSecurityConfigurerAdapter {
 
 
     private final JwtAuthenticationEntryPoint unauthorizedHandler;
+    private final AuthService authService;
 
     @Autowired
-    public AuthorizationConfig(JwtAuthenticationEntryPoint unauthorizedHandler) {
+    public AuthorizationConfig(JwtAuthenticationEntryPoint unauthorizedHandler, AuthService authService) {
         this.unauthorizedHandler = unauthorizedHandler;
+        this.authService = authService;
     }
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        JwtAuthFilter authenticationTokenFilter = new JwtAuthFilter();
+        JwtAuthFilter authenticationTokenFilter = new JwtAuthFilter(this.authService);
         httpSecurity
                 // we don't need CSRF because our token is invulnerable
-
                 .csrf().disable()
                 .httpBasic().disable()
                 .exceptionHandling().authenticationEntryPoint( this.unauthorizedHandler ).and()

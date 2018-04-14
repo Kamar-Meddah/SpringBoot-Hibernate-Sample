@@ -41,7 +41,7 @@ public class User {
 
     @JsonIgnore
     @Column(name = "remember_token", unique = true)
-    @Size(max = 511)
+    @Size(max = 305)
     private String rememberToken;
 
     @JsonIgnore

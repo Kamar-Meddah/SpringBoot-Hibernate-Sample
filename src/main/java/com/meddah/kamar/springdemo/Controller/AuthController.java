@@ -5,6 +5,7 @@ import com.meddah.kamar.springdemo.Service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -27,14 +28,14 @@ public class AuthController {
     }
 
 
-    @PostMapping
+    @PutMapping
     public Map<String, String> authenticate(@RequestBody User user) {
         Map<String, String> res = new TreeMap<>();
         User resUser = this.authService.checkEmailOrUsernameExist( user.getUsername() );
         if (resUser != null) {
             if (this.authService.checkPassword( user.getPassword(), resUser.getPassword() )) {
                 String token = this.authService.generateJWT( resUser );
-                res.put( "token", token);
+                res.put( "token", token );
                 res.put( "message", "Successfully Logged" );
                 resUser.setRememberToken( token );
                 this.authService.update( resUser );
@@ -46,6 +47,13 @@ public class AuthController {
             res.put( "token", null );
             res.put( "message", "Username Or Email Does not exist" );
         }
+        return res;
+    }
+
+    @GetMapping
+    public Map<String, Boolean> checkToken(HttpServletRequest request) {
+        Map<String,Boolean> res = new TreeMap<>();
+        res.put( "valid", this.authService.checkToken( request.getHeader( "Authorization" ) ) != null );
         return res;
     }
 

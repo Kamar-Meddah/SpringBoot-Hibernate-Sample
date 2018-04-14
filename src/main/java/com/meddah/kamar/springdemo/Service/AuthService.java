@@ -6,7 +6,9 @@ import com.meddah.kamar.springdemo.Repository.UserRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -51,7 +53,7 @@ public class AuthService {
                 .setSubject( String.valueOf( user.getId() ) )
                 .setIssuedAt( Date.from( Instant.ofEpochMilli( System.currentTimeMillis() ) ) )
                 .setExpiration( Date.from( Instant.ofEpochMilli( System.currentTimeMillis() + BaseConfig.jwtExp ) ) )
-                .setAudience( user.getRole() )
+                .setAudience( String.valueOf( user.getRole() ) )
                 .setId( UUID.randomUUID().toString() )
                 .signWith( SignatureAlgorithm.HS256, BaseConfig.jwtSecret ).compact();
         return token;
@@ -64,6 +66,17 @@ public class AuthService {
 
     public void update(User user) {
         this.userRepository.save( user );
+    }
+
+    public User checkToken(String token) {
+        User user;
+        try {
+            Jwts.parser().setSigningKey(BaseConfig.jwtSecret).parseClaimsJws( token );
+            user = this.userRepository.findUserByRememberToken( token );
+        } catch (Exception e) {
+            user = null;
+        }
+        return user;
     }
 
 }

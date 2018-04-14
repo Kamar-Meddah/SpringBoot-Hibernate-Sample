@@ -1,6 +1,9 @@
 package com.meddah.kamar.springdemo.Config.Filters;
 
-import org.springframework.security.core.context.SecurityContextHolder;
+import com.meddah.kamar.springdemo.Model.User;
+import com.meddah.kamar.springdemo.Service.AuthService;
+import com.meddah.kamar.springdemo.auth.AuthFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -11,19 +14,22 @@ import java.io.IOException;
 
 public class JwtAuthFilter extends OncePerRequestFilter {
 
+    private final AuthService authService;
+
+    @Autowired
+    public JwtAuthFilter(AuthService authService) {
+        this.authService = authService;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-        System.out.print( request.getHeader( "Authorization" ) );
-        System.out.print( SecurityContextHolder.getContext().getAuthentication() );
-
-        if (request.getMethod().equals( "GET" )) {
+        User user = this.authService.checkToken( request.getHeader( "Authorization" ) );
+        if (user != null) {
+            AuthFactory.setUser( user );
             chain.doFilter( request, response );
         } else {
-            if (request.getHeader( "Authorization" ) != null) {
-                chain.doFilter( request, response );
-            } else {
-                response.sendError( 401 );
-            }
+            response.sendError( 401 );
         }
     }
+
 }
