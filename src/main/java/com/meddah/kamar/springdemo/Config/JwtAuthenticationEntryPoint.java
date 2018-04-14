@@ -1,4 +1,4 @@
-package com.meddah.kamar.springdemo.Configs;
+package com.meddah.kamar.springdemo.Config;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;

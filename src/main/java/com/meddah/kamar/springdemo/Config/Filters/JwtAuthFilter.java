@@ -1,4 +1,4 @@
-package com.meddah.kamar.springdemo.Configs.Filters;
+package com.meddah.kamar.springdemo.Config.Filters;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
