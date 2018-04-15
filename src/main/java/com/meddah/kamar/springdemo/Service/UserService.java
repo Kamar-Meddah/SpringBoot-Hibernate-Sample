@@ -37,7 +37,7 @@ public class UserService {
     public User update(User user) {
         User authenticatedUser = AuthFactory.getUser();
         if (user.getPassword() != null) {
-            authenticatedUser.setPassword( this.hash( user.getPassword() ) );
+                authenticatedUser.setPassword( this.hash( user.getPassword() ) );
         }
         if (user.getEmail() != null && user.getEmail().matches( "^\\w+([.-]?\\w+)*@\\w+([.-]?\\w+)*(\\.\\w{2,3})+$" )) {
             authenticatedUser.setEmail( user.getEmail() );
