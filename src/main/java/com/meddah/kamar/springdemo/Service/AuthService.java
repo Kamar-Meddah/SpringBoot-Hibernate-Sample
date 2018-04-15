@@ -6,9 +6,7 @@ import com.meddah.kamar.springdemo.Repository.UserRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -58,12 +56,23 @@ public class AuthService {
     public User checkToken(String token) {
         User user;
         try {
-            Jwts.parser().setSigningKey(BaseConfig.jwtSecret).parseClaimsJws( token );
+            Jwts.parser().setSigningKey( BaseConfig.jwtSecret ).parseClaimsJws( token );
             user = this.userRepository.findUserByRememberToken( token );
         } catch (Exception e) {
             user = null;
         }
         return user;
+    }
+
+    public boolean logout(String token) {
+        User user = this.userRepository.findUserByRememberToken( token );
+        if (user != null) {
+            user.setRememberToken( null );
+            this.userRepository.save( user );
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

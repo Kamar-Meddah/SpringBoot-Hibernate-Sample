@@ -28,7 +28,7 @@ public class AuthController {
     }
 
 
-    @PutMapping
+    @PostMapping("")
     public Map<String, String> authenticate(@RequestBody User user) {
         Map<String, String> res = new TreeMap<>();
         User resUser = this.authService.checkEmailOrUsernameExist( user.getUsername() );
@@ -55,6 +55,11 @@ public class AuthController {
         Map<String,Boolean> res = new TreeMap<>();
         res.put( "valid", this.authService.checkToken( request.getHeader( "Authorization" ) ) != null );
         return res;
+    }
+
+    @PutMapping
+    public boolean logout(HttpServletRequest request){
+        return this.authService.logout(request.getHeader( "Authorization" ));
     }
 
 }
