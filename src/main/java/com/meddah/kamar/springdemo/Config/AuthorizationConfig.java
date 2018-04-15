@@ -37,6 +37,7 @@ public class AuthorizationConfig extends WebSecurityConfigurerAdapter {
                 // we don't need CSRF because our token is invulnerable
                 .csrf().disable()
                 .httpBasic().disable()
+                .cors().and()
                 .exceptionHandling().authenticationEntryPoint( this.unauthorizedHandler ).and()
                 // don't create session
                 .sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS ).and()
