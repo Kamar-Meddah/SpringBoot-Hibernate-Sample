@@ -9,13 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.TreeMap;
 
-@CrossOrigin(
-        allowCredentials = "false",
-        origins = "*",
-        methods = {RequestMethod.POST, RequestMethod.GET, RequestMethod.PUT},
-        allowedHeaders = {"Content-Type", "Authorization", "X-Requested-With"},
-        maxAge = 86400
-)
 @RestController
 @RequestMapping("api/auth/")
 public class AuthController {
@@ -52,14 +45,14 @@ public class AuthController {
 
     @GetMapping
     public Map<String, Boolean> checkToken(HttpServletRequest request) {
-        Map<String,Boolean> res = new TreeMap<>();
+        Map<String, Boolean> res = new TreeMap<>();
         res.put( "valid", this.authService.checkToken( request.getHeader( "Authorization" ) ) != null );
         return res;
     }
 
     @PutMapping
-    public boolean logout(HttpServletRequest request){
-        return this.authService.logout(request.getHeader( "Authorization" ));
+    public boolean logout(HttpServletRequest request) {
+        return this.authService.logout( request.getHeader( "Authorization" ) );
     }
 
 }
