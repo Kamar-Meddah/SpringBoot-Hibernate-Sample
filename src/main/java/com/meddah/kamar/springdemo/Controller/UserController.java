@@ -4,6 +4,7 @@ import com.meddah.kamar.springdemo.Model.User;
 import com.meddah.kamar.springdemo.Security.Annotation.Authenticated;
 import com.meddah.kamar.springdemo.Security.auth.AuthFactory;
 import com.meddah.kamar.springdemo.Service.AuthService;
+import com.meddah.kamar.springdemo.Service.EmailService;
 import com.meddah.kamar.springdemo.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +18,13 @@ public class UserController {
 
     private final UserService userService;
     private final AuthService authService;
+    private final EmailService emailService;
 
     @Autowired
-    public UserController(UserService userService, AuthService authService) {
+    public UserController(UserService userService, AuthService authService, EmailService emailService) {
         this.userService = userService;
         this.authService = authService;
+        this.emailService = emailService;
     }
 
     @PostMapping
@@ -34,7 +37,9 @@ public class UserController {
             res.put( "created", "false" );
             res.put( "message", "username already exist" );
         } else {
-            res.put( "created", String.valueOf( this.userService.create( user ) != null ) );
+            User newUser = this.userService.create( user );
+            this.emailService.sendEmail( newUser.getEmail(), "Welcome", String.join( "\n", "Hello " + newUser.getUsername(), "thx for your registration" ), String.join( "\n", "<h1 style='color: firebrick'>Hello " + newUser.getUsername() + "</h1>", "<p>Thx for your registration</p>" ) );
+            res.put( "created", String.valueOf( true ) );
             res.put( "message", "Request has been sent Successfully" );
         }
         return res;
@@ -46,7 +51,7 @@ public class UserController {
     public Map<String, String> updateUser(@RequestBody User user) {
         Map<String, String> res = new TreeMap<>();
         if (user.getPassword() != null && user.getEmail() == null) {
-            if (this.authService.checkPassword( user.getOldPassword(), AuthFactory.getUser().getPassword()) ) {
+            if (this.authService.checkPassword( user.getOldPassword(), AuthFactory.getUser().getPassword() )) {
                 this.userService.update( user );
                 res.put( "updated", String.valueOf( true ) );
                 res.put( "message", "Successfully updated" );
@@ -55,11 +60,11 @@ public class UserController {
                 res.put( "message", "Wrong Password" );
             }
         } else {
-            if(this.authService.checkEmailOrUsernameExist( user.getEmail()) == null){
+            if (this.authService.checkEmailOrUsernameExist( user.getEmail() ) == null) {
                 this.userService.update( user );
                 res.put( "updated", String.valueOf( true ) );
                 res.put( "message", "Successfully updated" );
-            }else{
+            } else {
                 res.put( "updated", String.valueOf( false ) );
                 res.put( "message", "Email already exist" );
             }
@@ -68,4 +73,5 @@ public class UserController {
 
         return res;
     }
+
 }

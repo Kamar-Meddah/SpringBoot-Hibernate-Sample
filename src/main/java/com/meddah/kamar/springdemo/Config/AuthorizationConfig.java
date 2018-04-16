@@ -21,9 +21,10 @@ public class AuthorizationConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
+                .headers().frameOptions().sameOrigin().and()
                 // we don't need CSRF because our token is invulnerable
                 .csrf().disable()
-                .cors().and();
+                .cors();
     }
 
     @Bean

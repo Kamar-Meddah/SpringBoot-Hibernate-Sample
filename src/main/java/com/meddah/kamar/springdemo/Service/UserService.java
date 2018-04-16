@@ -48,4 +48,5 @@ public class UserService {
     private String hash(String password) {
         return BCrypt.hashpw( password, BCrypt.gensalt() );
     }
+
 }
