@@ -3,6 +3,8 @@ package com.meddah.kamar.springdemo.Service;
 import com.meddah.kamar.springdemo.Config.BaseConfig;
 import com.meddah.kamar.springdemo.Model.User;
 import com.meddah.kamar.springdemo.Repository.UserRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,23 +58,17 @@ public class AuthService {
     public User checkToken(String token) {
         User user;
         try {
-            Jwts.parser().setSigningKey( BaseConfig.jwtSecret ).parseClaimsJws( token );
-            user = this.userRepository.findUserByRememberToken( token );
+            Jws<Claims> jwt = Jwts.parser().setSigningKey( BaseConfig.jwtSecret ).parseClaimsJws( token );
+            user = this.userRepository.findUserByIdAndRememberToken( UUID.fromString( jwt.getBody().getSubject() ), token );
         } catch (Exception e) {
             user = null;
         }
         return user;
     }
 
-    public boolean logout(String token) {
-        User user = this.userRepository.findUserByRememberToken( token );
-        if (user != null) {
-            user.setRememberToken( null );
-            this.userRepository.save( user );
-            return true;
-        } else {
-            return false;
-        }
+    public void logout(User user) {
+        user.setRememberToken( null );
+        this.userRepository.save( user );
     }
 
 }

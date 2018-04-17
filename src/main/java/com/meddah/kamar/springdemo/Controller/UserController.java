@@ -9,8 +9,10 @@ import com.meddah.kamar.springdemo.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("api/user/")
@@ -28,50 +30,56 @@ public class UserController {
     }
 
     @PostMapping
-    public Map<String, String> createUser(@RequestBody User user) {
-        Map<String, String> res = new TreeMap<>();
+    public void createUser(HttpServletResponse response, @RequestBody User user) throws IOException {
         if (this.userService.checkEmailExist( user.getEmail() )) {
-            res.put( "created", "false" );
-            res.put( "message", "Email already exist" );
+            response.sendError( 406, "Email already exist" );
         } else if (this.userService.checkUsernameExist( user.getUsername() )) {
-            res.put( "created", "false" );
-            res.put( "message", "username already exist" );
+            response.sendError( 406, "username already exist" );
         } else {
             User newUser = this.userService.create( user );
             this.emailService.sendEmail( newUser.getEmail(), "Welcome", String.join( "\n", "Hello " + newUser.getUsername(), "thx for your registration" ), String.join( "\n", "<h1 style='color: firebrick'>Hello " + newUser.getUsername() + "</h1>", "<p>Thx for your registration</p>" ) );
-            res.put( "created", String.valueOf( true ) );
-            res.put( "message", "Request has been sent Successfully" );
+            response.setStatus( 201 );
         }
-        return res;
     }
 
-
-    @PutMapping
+    @PutMapping("{id}")
     @Authenticated
-    public Map<String, String> updateUser(@RequestBody User user) {
-        Map<String, String> res = new TreeMap<>();
-        if (user.getPassword() != null && user.getEmail() == null) {
-            if (this.authService.checkPassword( user.getOldPassword(), AuthFactory.getUser().getPassword() )) {
-                this.userService.update( user );
-                res.put( "updated", String.valueOf( true ) );
-                res.put( "message", "Successfully updated" );
-            } else {
-                res.put( "updated", String.valueOf( false ) );
-                res.put( "message", "Wrong Password" );
+    public void updateUser(HttpServletResponse response, @RequestBody Map<String, String> input, @PathVariable("id") String id) throws IOException {
+        if (Objects.equals( AuthFactory.getUser().getId().toString(), id )) {
+            User user = new User( input.get( "email" ), input.get( "password" ) );
+            // password update
+            if (user.getPassword() != null) {
+                if (this.authService.checkPassword( input.get( "oldPassword" ), AuthFactory.getUser().getPassword() )) {
+                    this.userService.update( user );
+                    response.setStatus( 201 );
+                } else {
+                    response.sendError( 406, "Wrong Password" );
+                }
             }
+            // end password update
+
+            //  Email Update
+            if (user.getEmail() != null) {
+                if (this.authService.checkEmailOrUsernameExist( user.getEmail() ) == null) {
+                    this.userService.update( user );
+                    response.setStatus( 201 );
+                } else {
+                    response.sendError( 406, "Email already exist" );
+                }
+            }
+            //  End Email Update
         } else {
-            if (this.authService.checkEmailOrUsernameExist( user.getEmail() ) == null) {
-                this.userService.update( user );
-                res.put( "updated", String.valueOf( true ) );
-                res.put( "message", "Successfully updated" );
-            } else {
-                res.put( "updated", String.valueOf( false ) );
-                res.put( "message", "Email already exist" );
-            }
-
+            response.sendError( 401 );
         }
-
-        return res;
     }
 
+    @PatchMapping("password")
+    public void resetPassword() {
+        //
+    }
+
+    @RequestMapping(value = "", method = RequestMethod.HEAD)
+    public boolean checkEmailIsValid() {
+        return false;
+    }
 }

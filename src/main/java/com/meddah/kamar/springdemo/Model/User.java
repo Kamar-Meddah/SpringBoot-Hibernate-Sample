@@ -14,41 +14,44 @@ import java.util.UUID;
 @Getter
 @Setter
 public class User {
-
     @Column(name = "id")
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-
     @Column(name = "username", nullable = false, unique = true)
     private String username;
-
     @Column(name = "email", nullable = false, unique = true)
     private String email;
-
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "password", nullable = false)
     private String password;
-
     @Column(name = "role")
     private String role;
-
     @JsonIgnore
     @Column(name = "reset_token", unique = true)
     private String resetToken;
-
     @JsonIgnore
     @Column(name = "remember_token", unique = true)
     @Size(max = 305)
     private String rememberToken;
-
     @JsonIgnore
     @Column(name = "confirmation_token", unique = true)
     private String confirmationToken;
 
-    @Transient
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String oldPassword;
+    public User() {
+    }
+
+    public User(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+
+    public User(String username, String email, String password, String role) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
 
     @Override
     public String toString() {

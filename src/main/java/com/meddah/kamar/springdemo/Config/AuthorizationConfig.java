@@ -31,7 +31,7 @@ public class AuthorizationConfig extends WebSecurityConfigurerAdapter {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins( Arrays.asList( "*" ) );
-        configuration.setAllowedMethods( Arrays.asList( "GET", "POST", "DELETE", "PUT" ) );
+        configuration.setAllowedMethods( Arrays.asList( "GET", "POST", "DELETE", "PUT","PATCH","HEAD" ) );
         configuration.setAllowedHeaders( Arrays.asList( "Content-Type", "Authorization", "X-Requested-With" ) );
         configuration.setAllowCredentials( false );
         configuration.setMaxAge( (long) 86400 );

@@ -37,7 +37,7 @@ public class UserService {
     public User update(User user) {
         User authenticatedUser = AuthFactory.getUser();
         if (user.getPassword() != null) {
-                authenticatedUser.setPassword( this.hash( user.getPassword() ) );
+            authenticatedUser.setPassword( this.hash( user.getPassword() ) );
         }
         if (user.getEmail() != null && user.getEmail().matches( "^\\w+([.-]?\\w+)*@\\w+([.-]?\\w+)*(\\.\\w{2,3})+$" )) {
             authenticatedUser.setEmail( user.getEmail() );
@@ -48,5 +48,11 @@ public class UserService {
     private String hash(String password) {
         return BCrypt.hashpw( password, BCrypt.gensalt() );
     }
+
+    public void UpdatePassword(User user) {
+        this.userRepository.save( user );
+    }
+
+
 
 }
