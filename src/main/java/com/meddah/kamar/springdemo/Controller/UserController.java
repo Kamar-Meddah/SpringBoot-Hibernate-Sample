@@ -1,5 +1,6 @@
 package com.meddah.kamar.springdemo.Controller;
 
+import com.meddah.kamar.springdemo.Exception.UserException;
 import com.meddah.kamar.springdemo.Model.User;
 import com.meddah.kamar.springdemo.Security.Annotation.Authenticated;
 import com.meddah.kamar.springdemo.Security.auth.AuthFactory;
@@ -44,7 +45,7 @@ public class UserController {
 
     @PutMapping("{id}")
     @Authenticated
-    public void updateUser(HttpServletResponse response, @RequestBody Map<String, String> input, @PathVariable("id") String id) throws IOException {
+    public void updateUser(HttpServletResponse response, @RequestBody Map<String, String> input, @PathVariable("id") String id) throws IOException, UserException {
         if (Objects.equals( AuthFactory.getUser().getId().toString(), id )) {
             User user = new User( input.get( "email" ), input.get( "password" ) );
             // password update
@@ -71,15 +72,5 @@ public class UserController {
         } else {
             response.sendError( 401 );
         }
-    }
-
-    @PatchMapping("password")
-    public void resetPassword() {
-        //
-    }
-
-    @RequestMapping(value = "", method = RequestMethod.HEAD)
-    public boolean checkEmailIsValid() {
-        return false;
     }
 }

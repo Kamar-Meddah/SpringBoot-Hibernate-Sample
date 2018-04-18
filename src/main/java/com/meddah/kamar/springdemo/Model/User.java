@@ -2,6 +2,7 @@ package com.meddah.kamar.springdemo.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.meddah.kamar.springdemo.Exception.UserException;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,7 +28,7 @@ public class User {
     private String password;
     @Column(name = "role")
     private String role;
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "reset_token", unique = true)
     private String resetToken;
     @JsonIgnore
@@ -38,19 +39,19 @@ public class User {
     @Column(name = "confirmation_token", unique = true)
     private String confirmationToken;
 
-    public User() {
-    }
-
     public User(String email, String password) {
         this.email = email;
         this.password = password;
     }
 
-    public User(String username, String email, String password, String role) {
-        this.username = username;
+    public User() {
+    }
+
+    public void setEmail(String email) throws UserException {
+        if (!((email.matches( "^\\w+([.-]?\\w+)*@\\w+([.-]?\\w+)*(\\.\\w{2,3})+$" )))) {
+            throw new UserException( "Invalid Email" );
+        }
         this.email = email;
-        this.password = password;
-        this.role = role;
     }
 
     @Override
@@ -66,4 +67,5 @@ public class User {
                 ", confirmationToken='" + confirmationToken + '\'' +
                 '}';
     }
+
 }

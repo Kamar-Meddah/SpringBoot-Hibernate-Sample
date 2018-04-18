@@ -1,5 +1,6 @@
 package com.meddah.kamar.springdemo.Service;
 
+import com.meddah.kamar.springdemo.Exception.UserException;
 import com.meddah.kamar.springdemo.Model.User;
 import com.meddah.kamar.springdemo.Repository.UserRepository;
 import com.meddah.kamar.springdemo.Security.auth.AuthFactory;
@@ -34,7 +35,7 @@ public class UserService {
         return this.userRepository.findUserByEmail( email ) != null;
     }
 
-    public User update(User user) {
+    public User update(User user) throws UserException {
         User authenticatedUser = AuthFactory.getUser();
         if (user.getPassword() != null) {
             authenticatedUser.setPassword( this.hash( user.getPassword() ) );
@@ -49,9 +50,6 @@ public class UserService {
         return BCrypt.hashpw( password, BCrypt.gensalt() );
     }
 
-    public void UpdatePassword(User user) {
-        this.userRepository.save( user );
-    }
 
 
 

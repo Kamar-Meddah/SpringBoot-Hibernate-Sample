@@ -8,6 +8,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -34,14 +35,14 @@ public class AuthService {
     }
 
     public String generateJWT(User user) {
-        String token = null;
+        String token;
         token = Jwts.builder()
                 .setIssuer( user.getUsername() )
                 .setSubject( String.valueOf( user.getId() ) )
                 .setIssuedAt( Date.from( Instant.ofEpochMilli( System.currentTimeMillis() ) ) )
                 .setExpiration( Date.from( Instant.ofEpochMilli( System.currentTimeMillis() + BaseConfig.jwtExp ) ) )
                 .setAudience( String.valueOf( user.getRole() ) )
-                .setId( UUID.randomUUID().toString() )
+                .setId( UUID.randomUUID().toString().replaceAll("-", "") )
                 .signWith( SignatureAlgorithm.HS256, BaseConfig.jwtSecret ).compact();
         return token;
     }
@@ -70,5 +71,14 @@ public class AuthService {
         user.setRememberToken( null );
         this.userRepository.save( user );
     }
+
+    public User findByResetToken(String resetToken) {
+        return this.userRepository.findUserByResetToken( resetToken );
+    }
+
+    public String hash(String password) {
+        return BCrypt.hashpw( password, BCrypt.gensalt() );
+    }
+
 
 }
