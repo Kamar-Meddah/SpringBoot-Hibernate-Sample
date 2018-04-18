@@ -1,6 +1,8 @@
 package com.meddah.kamar.springdemo.Repository;
 
 import com.meddah.kamar.springdemo.Model.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -17,4 +19,8 @@ public interface UserRepository extends CrudRepository<User, UUID> {
     User findUserByIdAndRememberToken(UUID id, @Size(max = 305) String rememberToken);
 
     User findUserByResetToken(String resetToken);
+
+    Page<User> findAll(Pageable pageable);
+
+    User findUserById(UUID id);
 }

@@ -5,8 +5,13 @@ import com.meddah.kamar.springdemo.Model.User;
 import com.meddah.kamar.springdemo.Repository.UserRepository;
 import com.meddah.kamar.springdemo.Security.auth.AuthFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -50,7 +55,20 @@ public class UserService {
         return BCrypt.hashpw( password, BCrypt.gensalt() );
     }
 
+    public Page<User> getAllPaginated(int page) {
+        return this.userRepository.findAll( PageRequest.of( page, 1, Sort.by( Sort.Direction.ASC, "username" ) ) );
+    }
 
+    public void deleteOne(UUID id) {
+        this.userRepository.deleteById( id );
+    }
+
+    public void updateRole(String role, UUID id) {
+        User user = this.userRepository.findUserById( id );
+        user.setRole( role );
+        user.setConfirmationToken( null );
+        this.userRepository.save( user );
+    }
 
 
 }

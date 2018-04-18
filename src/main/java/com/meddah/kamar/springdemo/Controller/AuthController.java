@@ -37,11 +37,15 @@ public class AuthController {
         User resUser = this.authService.checkEmailOrUsernameExist( user.getUsername() );
         if (resUser != null) {
             if (this.authService.checkPassword( user.getPassword(), resUser.getPassword() )) {
-                String token = this.authService.generateJWT( resUser );
-                res.put( "token", token );
-                resUser.setRememberToken( token );
-                this.authService.update( resUser );
-                response.setStatus( 200 );
+                if(resUser.getConfirmationToken() == null) {
+                    String token = this.authService.generateJWT( resUser );
+                    res.put( "token", token );
+                    resUser.setRememberToken( token );
+                    this.authService.update( resUser );
+                    response.setStatus( 200 );
+                }else{
+                    response.sendError( 406, "Account is not yet confirmed by the admin" );
+                }
             } else {
                 response.sendError( 406, "Wrong password" );
             }

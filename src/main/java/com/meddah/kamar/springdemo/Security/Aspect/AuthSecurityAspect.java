@@ -49,7 +49,6 @@ public class AuthSecurityAspect {
         HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
 
         User user = AuthFactory.getUser();
-        System.out.println(user.getRole());
         if (Objects.equals( user.getRole(), "admin" )) {
             return pjp.proceed();
         } else {

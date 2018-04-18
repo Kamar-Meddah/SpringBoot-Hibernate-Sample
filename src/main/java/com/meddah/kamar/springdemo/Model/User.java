@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -35,9 +36,13 @@ public class User {
     @Column(name = "remember_token", unique = true)
     @Size(max = 305)
     private String rememberToken;
-    @JsonIgnore
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Column(name = "confirmation_token", unique = true)
     private String confirmationToken;
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
 
     public User(String email, String password) {
         this.email = email;
