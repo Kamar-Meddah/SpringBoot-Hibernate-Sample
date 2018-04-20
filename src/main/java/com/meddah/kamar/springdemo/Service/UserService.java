@@ -56,7 +56,11 @@ public class UserService {
     }
 
     public Page<User> getAllPaginated(int page) {
-        return this.userRepository.findAll( PageRequest.of( page, 1, Sort.by( Sort.Direction.ASC, "username" ) ) );
+        return this.userRepository.findAll( PageRequest.of( page, 20, Sort.by( Sort.Direction.ASC, "username" ) ) );
+    }
+
+    public Page<User> search(String query, int page) {
+        return this.userRepository.findAllByUsernameLike( '%'+query+'%', PageRequest.of( page, 20, Sort.by( Sort.Direction.ASC, "username" ) ) );
     }
 
     public void deleteOne(UUID id) {

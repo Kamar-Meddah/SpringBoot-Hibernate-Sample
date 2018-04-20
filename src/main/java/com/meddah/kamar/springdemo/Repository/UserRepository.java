@@ -22,5 +22,7 @@ public interface UserRepository extends CrudRepository<User, UUID> {
 
     Page<User> findAll(Pageable pageable);
 
+    Page<User> findAllByUsernameLike(String username, Pageable pageable);
+
     User findUserById(UUID id);
 }

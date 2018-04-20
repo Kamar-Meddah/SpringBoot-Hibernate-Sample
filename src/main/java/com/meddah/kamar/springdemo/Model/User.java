@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.meddah.kamar.springdemo.Exception.UserException;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -20,28 +21,36 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
+
     @Column(name = "username", nullable = false, unique = true)
     private String username;
+
     @Column(name = "email", nullable = false, unique = true)
     private String email;
+
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "password", nullable = false)
     private String password;
+
     @Column(name = "role")
     private String role;
+
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "reset_token", unique = true)
     private String resetToken;
+
     @JsonIgnore
     @Column(name = "remember_token", unique = true)
     @Size(max = 305)
     private String rememberToken;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     @Column(name = "confirmation_token", unique = true)
     private String confirmationToken;
-    @Column(name = "created_at")
+
+    @Column(name = "created_at", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
     private Date createdAt;
 
     public User(String email, String password) {

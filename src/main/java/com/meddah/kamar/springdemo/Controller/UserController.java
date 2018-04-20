@@ -40,7 +40,7 @@ public class UserController {
         } else if (this.userService.checkUsernameExist( user.getUsername() )) {
             response.sendError( 406, "username already exist" );
         } else {
-            user.setConfirmationToken( UUID.randomUUID().toString().replace( "-","" ) );
+            user.setConfirmationToken( UUID.randomUUID().toString().replace( "-", "" ) );
             User newUser = this.userService.create( user );
             this.emailService.sendEmail( newUser.getEmail(), "Welcome", String.join( "\n", "Hello " + newUser.getUsername(), "thx for your registration" ), String.join( "\n", "<h1 style='color: firebrick'>Hello " + newUser.getUsername() + "</h1>", "<p>Thx for your registration</p>" ) );
             response.setStatus( 201 );
@@ -82,10 +82,14 @@ public class UserController {
     @GetMapping
     @Authenticated
     @Admin
-    public Page<User> index(HttpServletResponse response, @RequestParam(value = "page") String page) throws IOException {
+    public Page<User> index(HttpServletResponse response, @RequestParam(value = "page") String page, @RequestParam(value = "query", required = false) String query) throws IOException {
         int p = Integer.parseInt( page ) - 1;
         if (p >= 0) {
-            return this.userService.getAllPaginated( p );
+            if (query == null) {
+                return this.userService.getAllPaginated( p );
+            } else {
+                return this.userService.search( query, p );
+            }
         } else {
             response.sendError( 400, "invalid page input" );
             return null;
@@ -107,7 +111,7 @@ public class UserController {
     @Authenticated
     @Admin
     public void patch(@PathVariable("id") String id, @RequestBody Map inputData, HttpServletResponse response) throws IOException {
-        if (Objects.equals( inputData.get( "role" ), "admin" ) || inputData.get( "role" ) == null) {
+        if (Objects.equals( inputData.get( "role" ), "admin" ) || Objects.equals( inputData.get( "role" ), "user" )) {
             try {
                 this.userService.updateRole( (String) inputData.get( "role" ), UUID.fromString( id ) );
                 response.setStatus( 201 );
