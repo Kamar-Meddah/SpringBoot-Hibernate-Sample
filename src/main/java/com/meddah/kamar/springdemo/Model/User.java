@@ -6,6 +6,7 @@ import com.meddah.kamar.springdemo.Exception.UserException;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -53,13 +54,20 @@ public class User {
     @CreationTimestamp
     private Date createdAt;
 
+    @Column(name = "updated_at", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    @UpdateTimestamp
+    private Date updatedAt;
+
+
+    public User() {
+    }
+
     public User(String email, String password) {
         this.email = email;
         this.password = password;
     }
 
-    public User() {
-    }
 
     public void setEmail(String email) throws UserException {
         if (!((email.matches( "^\\w+([.-]?\\w+)*@\\w+([.-]?\\w+)*(\\.\\w{2,3})+$" )))) {
@@ -67,6 +75,7 @@ public class User {
         }
         this.email = email;
     }
+
 
     @Override
     public String toString() {
